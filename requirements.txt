@@ -5,4 +5,4 @@ scipy==1.14.1
 numpy==2.1.2
 pandas==2.2.3
 sqlite_minutils==4.0.3
-#### Add text to install the python-package here
+-e ./python-package

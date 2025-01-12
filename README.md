@@ -1,7 +1,20 @@
 
 # Software Engineering for Data Scientists 
+![Project Image](images/image.png)
 
 This repository contains starter code for the **Software Engineering for Data Scientists** final project. Please reference your course materials for documentation on this repository's structure and important files. Happy coding!
+
+### How to start
+```
+. venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install pytest
+cd ./python-package
+python setup.py sdist
+cd ..
+if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+python report/dashboard.py
+```
 
 ### Repository Structure
 ```
