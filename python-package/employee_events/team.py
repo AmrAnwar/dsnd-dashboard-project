@@ -1,23 +1,29 @@
 # Import the QueryBase class
 # YOUR CODE HERE
-
-# Import dependencies for sql execution
-#### YOUR CODE HERE
+from .sql_execution import QueryMixin
+from .query_base import QueryBase
 
 # Create a subclass of QueryBase
 # called  `Team`
 #### YOUR CODE HERE
+class Team(QueryBase, QueryMixin):
 
     # Set the class attribute `name`
     # to the string "team"
     #### YOUR CODE HERE
-
+    name = "team"
 
     # Define a `names` method
     # that receives no arguments
     # This method should return
     # a list of tuples from an sql execution
     #### YOUR CODE HERE
+    def names(self):
+        query = f"""
+            SELECT team_name, team_id
+            FROM {self.name}
+        """
+        return self.query(query)
         
         # Query 5
         # Write an SQL query that selects
@@ -32,7 +38,13 @@
     # This method should return
     # a list of tuples from an sql execution
     #### YOUR CODE HERE
-
+    def username(self, id):
+        query = f"""
+            SELECT team_name, team_id
+            FROM {self.name}
+            WHERE team_id = {id}
+        """
+        return self.query(query)
         # Query 6
         # Write an SQL query
         # that selects the team_name column
@@ -51,8 +63,7 @@
     # the sql query
     #### YOUR CODE HERE
     def model_data(self, id):
-
-        return f"""
+        query_str = f"""
             SELECT positive_events, negative_events FROM (
                     SELECT employee_id
                          , SUM(positive_events) positive_events
@@ -64,3 +75,4 @@
                     GROUP BY employee_id
                    )
                 """
+        return self.pandas_query(query_str)

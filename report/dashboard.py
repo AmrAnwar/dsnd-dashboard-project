@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 
 # Import QueryBase, Employee, Team from employee_events
 #### YOUR CODE HERE
-
+from  employee_events import QueryBase, Employee, Team
 # import the load_model function from the utils.py file
 #### YOUR CODE HERE
-
+from .utils import load_model
 """
 Below, we import the parent classes
 you will use for subclassing
@@ -24,6 +24,7 @@ from combined_components import FormGroup, CombinedComponent
 
 # Create a subclass of base_components/dropdown
 # called `ReportDropdown`
+class ReportDropdown(Dropdown):
 #### YOUR CODE HERE
     
     # Overwrite the build_component method
@@ -37,6 +38,9 @@ from combined_components import FormGroup, CombinedComponent
         # Return the output from the
         # parent class's build_component method
         #### YOUR CODE HERE
+    def build_component(self, model, asset_id):
+        self.label = model.name
+        return super().build_component(model, asset_id)
     
     # Overwrite the `component_data` method
     # Ensure the method uses the same parameters
@@ -46,10 +50,14 @@ from combined_components import FormGroup, CombinedComponent
         # call the employee_events method
         # that returns the user-type's
         # names and ids
+    def component_data(self, model, asset_id):
+        return model.user_data(asset_id)
 
 
 # Create a subclass of base_components/BaseComponent
 # called `Header`
+class Header(BaseComponent):
+    pass
 #### YOUR CODE HERE
 
     # Overwrite the `build_component` method
@@ -61,72 +69,44 @@ from combined_components import FormGroup, CombinedComponent
         # return a fasthtml H1 objects
         # containing the model's name attribute
         #### YOUR CODE HERE
-          
+    def build_component(self, model, *args, **kwargs):
+        return H1(model.name)
 
 # Create a subclass of base_components/MatplotlibViz
 # called `LineChart`
-#### YOUR CODE HERE
+class LineChart(MatplotlibViz):
     
-    # Overwrite the parent class's `visualization`
-    # method. Use the same parameters as the parent
-    #### YOUR CODE HERE
-    
-
-        # Pass the `asset_id` argument to
-        # the model's `event_counts` method to
-        # receive the x (Day) and y (event count)
-        #### YOUR CODE HERE
-        
-        # Use the pandas .fillna method to fill nulls with 0
-        #### YOUR CODE HERE
-        
-        # User the pandas .set_index method to set
-        # the date column as the index
-        #### YOUR CODE HERE
-        
-        # Sort the index
-        #### YOUR CODE HERE
-        
-        # Use the .cumsum method to change the data
-        # in the dataframe to cumulative counts
-        #### YOUR CODE HERE
-        
-        
-        # Set the dataframe columns to the list
-        # ['Positive', 'Negative']
-        #### YOUR CODE HERE
-        
-        # Initialize a pandas subplot
-        # and assign the figure and axis
-        # to variables
-        #### YOUR CODE HERE
-        
-        # call the .plot method for the
-        # cumulative counts dataframe
-        #### YOUR CODE HERE
-        
-        # pass the axis variable
-        # to the `.set_axis_styling`
-        # method
-        #### YOUR CODE HERE
-        
-        # Set title and labels for x and y axis
-        #### YOUR CODE HERE
+    def visualization(self, entity_id, model):
+        df = model.event_counts(entity_id)
+        df = df.fillna(0)
+        df = df.set_index('date')
+        df = df.sort_index()
+        df = df.cumsum()
+        df.columns = ['Positive', 'Negative']
+        fig, ax = plt.subplots()
+        df.plot(ax=ax)
+        self.set_axis_styling(ax)
+        ax.set_title('Cumulative Event Counts')
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Event Count')
+        return fig
 
 
 # Create a subclass of base_components/MatplotlibViz
 # called `BarChart`
 #### YOUR CODE HERE
-
+class BarChart(MatplotlibViz):
+    pass
     # Create a `predictor` class attribute
     # assign the attribute to the output
     # of the `load_model` utils function
     #### YOUR CODE HERE
-
+    predictor = load_model()
     # Overwrite the parent class `visualization` method
     # Use the same parameters as the parent
     #### YOUR CODE HERE
-
+    def visualization(self, entity_id, model):
+    
         # Using the model and asset_id arguments
         # pass the `asset_id` to the `.model_data` method
         # to receive the data that can be passed to the machine
@@ -169,7 +149,7 @@ from combined_components import FormGroup, CombinedComponent
 # Create a subclass of combined_components/CombinedComponent
 # called Visualizations       
 #### YOUR CODE HERE
-
+class Visualizations(CombinedComponent):
     # Set the `children`
     # class attribute to a list
     # containing an initialized
@@ -181,6 +161,8 @@ from combined_components import FormGroup, CombinedComponent
             
 # Create a subclass of base_components/DataTable
 # called `NotesTable`
+class NotesTable(DataTable):
+    pass
 #### YOUR CODE HERE
 
     # Overwrite the `component_data` method
@@ -214,20 +196,21 @@ class DashboardFilters(FormGroup):
 # Create a subclass of CombinedComponents
 # called `Report`
 #### YOUR CODE HERE
-
+class Report(CombinedComponent):
     # Set the `children`
     # class attribute to a list
     # containing initialized instances 
     # of the header, dashboard filters,
     # data visualizations, and notes table
     #### YOUR CODE HERE
+    children = [NotesTable(), Visualizations(), Header(), DashboardFilters()]
 
 # Initialize a fasthtml app 
 #### YOUR CODE HERE
-
+app = FastHTML()
 # Initialize the `Report` class
 #### YOUR CODE HERE
-
+report = Report()
 
 # Create a route for a get request
 # Set the route's path to the root
@@ -238,6 +221,9 @@ class DashboardFilters(FormGroup):
     # of the QueryBase class as arguments
     # Return the result
     #### YOUR CODE HERE
+@app.get('/')
+def home_page():
+    return report(None, QueryBase())
 
 # Create a route for a get request
 # Set the route's path to receive a request
@@ -253,6 +239,9 @@ class DashboardFilters(FormGroup):
     # of the Employee SQL class as arguments
     # Return the result
     #### YOUR CODE HERE
+@app.get('/employee/{employee_id}')
+def employee_endpoint(employee_id: str):
+    return report(employee_id, Employee())
 
 # Create a route for a get request
 # Set the route's path to receive a request
@@ -268,7 +257,9 @@ class DashboardFilters(FormGroup):
     # of the Team SQL class as arguments
     # Return the result
     #### YOUR CODE HERE
-
+@app.get('/team/{team_id}')
+def team_endpoint(team_id: str):
+    return report(team_id, Team())
 
 # Keep the below code unchanged!
 @app.get('/update_dropdown{r}')

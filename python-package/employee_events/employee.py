@@ -1,5 +1,7 @@
 # Import the QueryBase class
 #### YOUR CODE HERE
+from sql_execution import QueryMixin
+from .query_base import QueryBase
 
 # Import dependencies needed for sql execution
 # from the `sql_execution` module
@@ -8,32 +10,34 @@
 # Define a subclass of QueryBase
 # called Employee
 #### YOUR CODE HERE
-
+class Employee(QueryBase, QueryMixin):
     # Set the class attribute `name`
     # to the string "employee"
     #### YOUR CODE HERE
-
+    name = "employee"
 
     # Define a method called `names`
     # that receives no arguments
     # This method should return a list of tuples
     # from an sql execution
-    #### YOUR CODE HERE
-        
-        # Query 3
-        # Write an SQL query
-        # that selects two columns 
-        # 1. The employee's full name
-        # 2. The employee's id
-        # This query should return the data
-        # for all employees in the database
-        #### YOUR CODE HERE
-    
+    def names(self):
+        query_str = f"""
+            SELECT first_name || ' ' || last_name AS full_name, employee_id
+            FROM {self.name}
+        """
+        return self.query(query_str)
 
     # Define a method called `username`
     # that receives an `id` argument
     # This method should return a list of tuples
     # from an sql execution
+    def username(self, id):
+        query_str = f"""
+            SELECT first_name || ' ' || last_name AS full_name, employee_id
+            FROM {self.name}
+            WHERE employee_id = {id}
+        """
+        return self.query(query_str)
     #### YOUR CODE HERE
         
         # Query 4
@@ -54,8 +58,7 @@
     # the sql query
     #### YOUR CODE HERE
     def model_data(self, id):
-
-        return f"""
+        panda_query_str = f"""
                     SELECT SUM(positive_events) positive_events
                          , SUM(negative_events) negative_events
                     FROM {self.name}
@@ -63,3 +66,4 @@
                         USING({self.name}_id)
                     WHERE {self.name}.{self.name}_id = {id}
                 """
+        return self.pandas_query(panda_query_str)
