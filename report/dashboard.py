@@ -1,12 +1,8 @@
 from fasthtml.common import *
 import matplotlib.pyplot as plt
 
-# Import QueryBase, Employee, Team from employee_events
-# YOUR CODE HERE
 from employee_events import QueryBase, Employee, Team
 
-# import the load_model function from the utils.py file
-# YOUR CODE HERE
 from utils import load_model
 
 """
@@ -18,8 +14,6 @@ from base_components import Dropdown, BaseComponent, Radio, MatplotlibViz, DataT
 from combined_components import FormGroup, CombinedComponent
 
 
-# Create a subclass of base_components/dropdown
-# called `ReportDropdown`
 class ReportDropdown(Dropdown):
     def build_component(self, entity_id, model):
         self.label = model.name
@@ -33,9 +27,6 @@ class Header(BaseComponent):
     def build_component(self, entity_id, model):
         return H1(model.name)
 
-
-# Create a subclass of base_components/MatplotlibViz
-# called `LineChart`
 class LineChart(MatplotlibViz):
 
     def visualization(self, entity_id, model):
@@ -57,13 +48,10 @@ class LineChart(MatplotlibViz):
 class BarChart(MatplotlibViz):
     predictor = load_model()
 
-    # Overwrite the parent class `visualization` method
-    # Use the same parameters as the parent
-    # YOUR CODE HERE
-    def visualization(self, asset_id, model):
-        machine_learning_data = model.model_data(asset_id)
+    def visualization(self, entity_id, model):
+        machine_learning_data = model.model_data(entity_id)
         results = self.predictor.predict_proba(machine_learning_data)
-        data = results[:, 1]
+        data = results[:, 1].reshape(-1, 1)
         if model.name == "team":
             pred = data.mean()
         else:
@@ -75,19 +63,12 @@ class BarChart(MatplotlibViz):
         ax.set_title("Predicted Recruitment Risk", fontsize=20)
         self.set_axis_styling(ax)
 
-
-# Create a subclass of combined_components/CombinedComponent
-# called Visualizations
-# YOUR CODE HERE
 class Visualizations(CombinedComponent):
     children = [LineChart(), BarChart()]
 
     # Leave this line unchanged
     outer_div_type = Div(cls="grid")
 
-
-# Create a subclass of base_components/DataTable
-# called `NotesTable`
 class NotesTable(DataTable):
     def component_data(self, entity_id, model):
         return model.notes(entity_id)
@@ -112,12 +93,7 @@ class DashboardFilters(FormGroup):
 class Report(CombinedComponent):
     children = [NotesTable(), Visualizations(), Header(), DashboardFilters()]
 
-
-# Initialize a fasthtml app
-# YOUR CODE HERE
 app = FastHTML()
-# Initialize the `Report` class
-# YOUR CODE HERE
 report = Report()
 
 @app.get("/")
