@@ -1,19 +1,21 @@
 # Import the QueryBase class
-#### YOUR CODE HERE
+# YOUR CODE HERE
 from sql_execution import QueryMixin
 from .query_base import QueryBase
 
 # Import dependencies needed for sql execution
 # from the `sql_execution` module
-#### YOUR CODE HERE
+# YOUR CODE HERE
 
 # Define a subclass of QueryBase
 # called Employee
-#### YOUR CODE HERE
+# YOUR CODE HERE
+
+
 class Employee(QueryBase, QueryMixin):
     # Set the class attribute `name`
     # to the string "employee"
-    #### YOUR CODE HERE
+    # YOUR CODE HERE
     name = "employee"
 
     # Define a method called `names`
@@ -38,16 +40,15 @@ class Employee(QueryBase, QueryMixin):
             WHERE employee_id = {id}
         """
         return self.query(query_str)
-    #### YOUR CODE HERE
-        
+    # YOUR CODE HERE
+
         # Query 4
         # Write an SQL query
         # that selects an employees full name
         # Use f-string formatting and a WHERE filter
         # to only return the full name of the employee
         # with an id equal to the id argument
-        #### YOUR CODE HERE
-
+        # YOUR CODE HERE
 
     # Below is method with an SQL query
     # This SQL query generates the data needed for
@@ -56,7 +57,8 @@ class Employee(QueryBase, QueryMixin):
     # so when it is called, a pandas dataframe
     # is returns containing the execution of
     # the sql query
-    #### YOUR CODE HERE
+    # YOUR CODE HERE
+
     def model_data(self, id):
         panda_query_str = f"""
                     SELECT SUM(positive_events) positive_events
